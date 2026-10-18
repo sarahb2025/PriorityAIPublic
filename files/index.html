@@ -836,6 +836,7 @@
 
       <div class="formcard reveal">
         <form id="leadForm" novalidate>
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
           <h3>Get in touch</h3>
           <p class="fsub">Tell us a little about your organisation and we will be in touch.</p>
           <div class="frow">
@@ -1240,7 +1241,7 @@
 
     // Optional: GHL webhook still fires in the background as a silent backup.
     // Leave as-is; it does not affect the email. Set to "" to disable.
-    const GHL_ENDPOINT = "https://services.leadconnectorhq.com/hooks/ESpu2ONlbfI68O4B46VT/webhook-trigger/fb13a7a6-003b-4cac-9412-0e90e6ca6e6e";
+    const GHL_ENDPOINT = "https://services.leadconnectorhq.com/hooks/0G1q3az6pgxch6abG2iE/webhook-trigger/b90acc7c-dedc-4103-9900-65c1e18eadcc";
     // =====================================================================
 
     const form = document.getElementById('leadForm');
@@ -1268,6 +1269,8 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      // Honeypot: real people never fill the hidden _gotcha field, bots do. Silently drop.
+      if (form._gotcha && form._gotcha.value) return;
       const name = form.name.value.trim();
       const email = form.email.value.trim();
       const org = form.organisation.value.trim();
@@ -1297,7 +1300,8 @@
         source: 'Priority AI website',
         assigned_to: 'sarah@aieconomy.ai',
         _subject: 'New Priority AI enquiry: ' + name + (org ? ' (' + org + ')' : ''),
-        _replyto: email
+        _replyto: email,
+        _gotcha: form._gotcha ? form._gotcha.value : ''
       };
 
       const original = submitBtn.innerHTML;
